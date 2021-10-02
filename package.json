@@ -6,7 +6,8 @@
   "scripts": {
     "Servidor": "node app.js",
     "ClientePublisher": "node MQTT_client/clientePublisher.js",
-    "ClienteSubscriber": "node MQTT_client/clienteSubscriber.js"
+    "ClienteSubscriber": "node MQTT_client/clienteSubscriber.js",
+    "Gerador": "node gerador_pacientes/gerador.js"
   },
   "author": "",
   "license": "ISC",
