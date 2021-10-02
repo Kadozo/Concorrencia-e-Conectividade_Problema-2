@@ -7,7 +7,7 @@
     "Servidor": "node app.js",
     "ClientePublisher": "node MQTT_client/clientePublisher.js",
     "ClienteSubscriber": "node MQTT_client/clienteSubscriber.js",
-    "Gerador": "node gerador_pacientes/gerador.js"
+    "Gerador": "node gerador_pacientes/gerador.js 10"
   },
   "author": "",
   "license": "ISC",

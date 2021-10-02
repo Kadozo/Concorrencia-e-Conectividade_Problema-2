@@ -9,7 +9,7 @@ const mqtt = require("mqtt");
 
 if (isMainThread) {
   //criação de (5) Threads
-  for (let index = 0; index < 5; index++) {
+  for (let index = 0; index < process.argv[2]; index++) {
     const worker = new Worker(__filename, { workerData: index + 1 });
   }
 } else {
