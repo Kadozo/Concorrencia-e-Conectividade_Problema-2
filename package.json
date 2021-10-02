@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "Servidor": "node app.js",
+    "ClientePublisher": "node MQTT_client/clientePublisher.js",
+    "ClienteSubscriber": "node MQTT_client/clienteSubscriber.js"
   },
   "author": "",
   "license": "ISC",
