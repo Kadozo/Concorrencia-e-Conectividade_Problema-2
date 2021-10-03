@@ -36,7 +36,7 @@ function valoresSensores(name) {
     oxigen: getRandomInt(85, 100),
     situation: "",
   };
-
+  paciente = verifySituation(paciente);
   //retorna uma string JSON
   return JSON.stringify(paciente);
 }
@@ -46,4 +46,20 @@ function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function verifySituation(paciente) {
+  if (
+    (paciente.freqCorp > 38 &&
+      paciente.freqResp > 20 &&
+      paciente.freqCard > 110 &&
+      paciente.presArt < 72) ||
+    paciente.oxigen < 92
+  ) {
+    paciente.situation = "Grave";
+  } else {
+    paciente.situation = "Estável";
+  }
+
+  return paciente;
 }

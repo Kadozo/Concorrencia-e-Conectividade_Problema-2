@@ -14,51 +14,7 @@ let pacientes = [];
 let amount = 10;
 //-----------------------------------------------------------------------------------------------------------
 
-const server = net.createServer((socket) => {
-  console.log("Novo cliente conectado!");
-
-  socket.on("end", () => {
-    console.log("Cliente desconectado.");
-  });
-
-  socket.on("error", () => {
-    console.log("Conexão abortada");
-  });
-
-  //função que será executada no momento que o servidor receber o dado
-  socket.on("data", (message) => {
-    message = verifySituation(JSON.parse(message)); // verifica se o paciente está estável ou grave
-    let match = null;
-    //percorre o array de pacientes para saber se deve atualizar ou criar um novo registro
-    pacientes.map((paciente) => {
-      if (paciente.name == message.name) {
-        match = message;
-      }
-    });
-    //se o paciente não tiver o nome no array, será criado o novo registro
-    if (!match) {
-      pacientes.push(message);
-      orderArray(pacientes); //ordena o array por gravidade (oxigenação)
-    }
-    // se o paciente já estiver no array, os dados serão atualizados
-    else {
-      let pos;
-      pacientes.map((paciente, index) => {
-        //procura o index do paciente que terá os dados atualizados
-        if (message.name == paciente.name) {
-          pos = index;
-        }
-      });
-      pacientes.splice(pos, 1, message); //substitui os dados do paciente
-
-      orderArray(pacientes); //ordena o array por gravidade (oxigenação)
-    }
-  });
-});
-
-server.listen(8000, "26.91.70.227", () => {
-  console.log("Servidor TCP iniciado em http://26.91.70.227:8000/");
-}); //servidor escutando na porta 8000 (para receber as informações dos pacientes)
+//Lógica para o mqtt
 
 //-----------------------------------------------------------------------------------------------------------
 
@@ -85,22 +41,6 @@ app.listen(_PORT, _IP, () => {
 //---------------------------------------------------------------------------------------------------------------
 
 //DECLARAÇÃO DE FUNÇÕES
-
-function verifySituation(paciente) {
-  if (
-    (paciente.freqCorp > 38 &&
-      paciente.freqResp > 20 &&
-      paciente.freqCard > 110 &&
-      paciente.presArt < 72) ||
-    paciente.oxigen < 92
-  ) {
-    paciente.situation = "Grave";
-  } else {
-    paciente.situation = "Estável";
-  }
-
-  return paciente;
-}
 
 function orderArray(pacientes) {
   quickSort(pacientes, 0, pacientes.length - 1);
