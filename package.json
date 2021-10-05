@@ -7,13 +7,14 @@
     "Servidor": "node app.js",
     "ClientePublisher": "node MQTT_client/clientePublisher.js",
     "ClienteSubscriber": "node MQTT_client/clienteSubscriber.js",
-    "Gerador": "node gerador_pacientes/gerador.js 10"
+    "Gerador": "node gerador_pacientes/gerador.js 10 0"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mqtt": "^4.2.8"
+    "mqtt": "^4.2.8",
+    "node-random-name": "^1.0.1"
   }
 }
