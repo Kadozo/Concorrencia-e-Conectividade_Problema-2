@@ -1,5 +1,9 @@
 const verifySituation = require("./verifySituation");
 const getRandomInt = require("./getRandomInt");
+/**
+ * Recebe um inteiro (tendency) e uma string (Name).
+ * Retorna uma string JSON com o  objeto Paciente com o name dado e com valores aleatórios baseados na tendency.
+ */
 
 function valoresSensores(tendency, name) {
   if (tendency == 1) {

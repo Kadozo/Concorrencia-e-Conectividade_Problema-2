@@ -1,7 +1,8 @@
-/*
-Verifica um Paciente através dos parametros dos sensores (TemperaturaCorporal, Frequencia Respiratória, 
-    Frequência Cardiáca, Pressão Arterial e Oxigenação) e retorna o objeto paciente com o campo situation 
-    preenchido de acordo
+/** 
+ * Recebe um objeto Paciente.
+ * Verifica um Paciente através dos parametros dos sensores (TemperaturaCorporal, 
+    Frequencia Respiratória, Frequência Cardiáca, Pressão Arterial e Oxigenação).
+ * Retorna o objeto paciente com o campo situation preenchido de acordo.
 */
 function verifySituation(paciente) {
   i = 0;

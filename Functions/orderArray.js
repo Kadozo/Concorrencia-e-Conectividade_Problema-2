@@ -1,3 +1,8 @@
+/**
+ * Recebe um Array.
+ * Retorna um Array Ordenado.
+ */
+
 function orderArray(pacientes) {
   quickSort(pacientes, 0, pacientes.length - 1);
 

@@ -1,3 +1,8 @@
+/**
+ * Recebe uma lista de pacientes e um inteiro amount.
+ * Retorna os amount itens da lista.
+ */
+
 function selectPatients(pacientes, amount) {
   let selectedElements = [];
   if (amount > pacientes.length) {
