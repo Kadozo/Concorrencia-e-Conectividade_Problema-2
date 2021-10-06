@@ -1,11 +1,10 @@
 const verifySituation = require("./verifySituation");
 const getRandomInt = require("./getRandomInt");
-const random_name = require("node-random-name");
 
-function valoresSensores(tendency) {
+function valoresSensores(tendency, name) {
   if (tendency == 1) {
     paciente = {
-      name: random_name(),
+      name: name,
       tempCorp: getRandomInt(36, 39),
       freqResp: getRandomInt(9, 16),
       freqCard: getRandomInt(51, 102),
@@ -15,7 +14,7 @@ function valoresSensores(tendency) {
     };
   } else {
     paciente = {
-      name: random_name(),
+      name: name,
       tempCorp: getRandomInt(38, 41),
       freqResp: getRandomInt(15, 29),
       freqCard: getRandomInt(98, 129),
