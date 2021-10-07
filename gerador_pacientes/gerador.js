@@ -1,4 +1,4 @@
-const { Worker, isMainThread, workerData } = require("worker_threads");
+const { Worker, isMainThread, workerData, threadId } = require("worker_threads");
 const getRandomInt = require("../Functions/getRandomInt");
 const valoresSensores = require("../Functions/valoresSensores");
 const random_name = require("node-random-name");
@@ -14,6 +14,8 @@ if (isMainThread) {
     const worker = new Worker(__filename, {
       workerData: {
         id: index + 1,
+        fogId: index % 5,
+        threadId: "0",
         tendency: tendency,
         patientName: random_name(),
       },
@@ -25,12 +27,27 @@ if (isMainThread) {
 
   client.on("connect", function () {
     console.log("Thread " + workerData.id + " - " + "Conectado ao Broker"); //Exibição de sucesso na conexão
-    setInterval(() => {
-      client.publish(
-        "Sensores",
-        valoresSensores(workerData.tendency, workerData.patientName)
-      );
-      console.log("Thread " + workerData.id + " - " + "Enviou dados ao Broker"); //Exibição de sucesso no envio dos dados
-    }, 100 * getRandomInt(30, 70));
+    
+    client.subscribe("Fog/" + workerData.fogId + "/connect", (err)=>{
+      if (!err) {
+        client.publish("Fog/" + workerData.fogId +  "/Sensor/publish", "Sensor conectado");
+      }
+    })
+      
+    client.on("message", (msg)=>{
+
+      client.unsubscribe("Fog/" + workerData.fogId + "/connect");
+
+      workerData.threadId = msg;
+
+      setInterval(() => {
+        client.publish(
+          "Fog/" + workerData.fogId + "/" + workerData.threadId + "/send",
+          valoresSensores(workerData.tendency, workerData.patientName)
+        ), (100*getRandomInt(10,50))
+        //console.log("Fog/" + workerData.fogId + "/" + workerData.threadId + "/send");
+      });
+    })
+
   });
 }
