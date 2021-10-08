@@ -27,6 +27,7 @@ function verifySituation(paciente) {
   } else {
     paciente.situation = "Estável";
   }
+  paciente.priority = i;
 
   return paciente;
 }

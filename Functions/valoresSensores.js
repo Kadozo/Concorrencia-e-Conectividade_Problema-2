@@ -14,6 +14,7 @@ function valoresSensores(tendency, name) {
       freqCard: getRandomInt(51, 102),
       presArt: getRandomInt(99, 100),
       oxigen: getRandomInt(91, 100),
+      priority: 0,
       situation: "",
     };
   } else {
@@ -24,6 +25,7 @@ function valoresSensores(tendency, name) {
       freqCard: getRandomInt(98, 129),
       presArt: getRandomInt(71, 100),
       oxigen: getRandomInt(83, 92),
+      priority: 0,
       situation: "",
     };
   }

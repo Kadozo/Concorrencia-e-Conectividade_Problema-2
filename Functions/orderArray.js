@@ -15,9 +15,9 @@ function quickSort(vet, ini, fim) {
   let m = Math.floor((i + f) / 2);
 
   while (i < f) {
-    while (vet[i].oxigen < vet[m].oxigen) i++;
+    while (vet[i].priority < vet[m].priority) i++;
 
-    while (vet[f].oxigen > vet[m].oxigen) f--;
+    while (vet[f].priority > vet[m].priority) f--;
 
     if (i <= f) {
       let temp = vet[i];
