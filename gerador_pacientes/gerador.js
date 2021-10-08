@@ -43,17 +43,25 @@ if (isMainThread) {
     });
 
     client.on("message", (topic, msg) => {
-      client.unsubscribe("Fog/" + workerData.fogId + "/connect");
+      client.unsubscribe(topic);
 
       workerData.threadId = msg.toString();
-      console.log("Publicar em: " + workerData.threadId + "/send");
+      console.log(
+        "Thread " +
+          workerData.threadId +
+          " - Publicar em: " +
+          "Fog/" +
+          workerData.fogId +
+          "/" +
+          workerData.threadId +
+          "/send"
+      );
       setInterval(() => {
         client.publish(
           "Fog/" + workerData.fogId + "/" + workerData.threadId + "/send",
           valoresSensores(workerData.tendency, workerData.patientName)
         );
-        //console.log("Fog/" + workerData.fogId + "/" + workerData.threadId + "/send");
-      }, 100 * getRandomInt(50, 100));
+      }, 5000);
     });
   });
 }
