@@ -5,9 +5,12 @@ const {
   parentPort,
 } = require("worker_threads");
 const order = require("../Functions/orderArray");
+const compare = require("../Functions/compare");
+const timsort = require("timsort");
 const mqtt = require("mqtt");
+
 //----------------------------------------------------------------------------------------------------------------
-let connectionLmt = 1;
+let connectionLmt = 2;
 let fogId = process.argv[2];
 let currentConnections = 0;
 let currentThreadId = 0;
@@ -16,7 +19,6 @@ let amount = 0;
 //----------------------------------------------------------------------------------------------------------------
 
 if (isMainThread) {
-  let trava = false;
   let pacientes = [];
   const client = mqtt.connect(brokerAdress); //Conexão com o Broker (Moquitto)
   if (currentThreadId == 0) {
@@ -31,10 +33,7 @@ if (isMainThread) {
       for (let index = 0; index < data.length; index++) {
         for (let index2 = 0; index2 < pacientes.length; index2++) {
           if (data[index].name == pacientes[index2].name) {
-            console.log("data antes: ", data[index]);
-            console.log("Pacientes antes: ", pacientes[index2]);
             pacientes[index2] = data[index];
-            console.log("Pacientes depois: ", pacientes);
             match = true;
           }
         }
@@ -42,6 +41,7 @@ if (isMainThread) {
           pacientes.push(data[index]);
         }
       }
+      //Criar o servidor e a função de envio de informações, repassar os dados sempre que organizar e decidir o método de conexão.
     });
   }
 
@@ -51,14 +51,13 @@ if (isMainThread) {
   client.on("message", (topic, msg) => {
     console.log("Fog " + fogId + " - Recebeu uma msg: " + msg);
     if (msg == "Sensor conectado") {
-      while (trava) {}
-      trava = true;
       if (currentConnections < connectionLmt) {
         currentConnections++;
         client.publish("Fog/" + fogId + "/connect", currentThreadId.toString());
       } else {
+        //O else ta resetando a contagem, mas ele ainda realiza uma conexão e n incrementa a variavel de conexões
         currentThreadId++;
-        currentConnections = 0;
+        currentConnections = 1; //Alterando para 1 resolve o problema e garante que n vai adicionar elementos a mais na thread
         const worker = new Worker(__filename, {
           workerData: {
             threadId: currentThreadId,
@@ -67,20 +66,20 @@ if (isMainThread) {
         });
         client.publish("Fog/" + fogId + "/connect", currentThreadId.toString());
         worker.on("message", (data) => {
-          console.log("Message");
+          let match = false;
           for (let index = 0; index < data.length; index++) {
             for (let index2 = 0; index2 < pacientes.length; index2++) {
               if (data[index].name == pacientes[index2].name) {
-                console.log("data antes: ", data[index]);
-                console.log("Pacientes antes: ", pacientes[index2]);
                 pacientes[index2] = data[index];
-                console.log("Pacientes depois: ", pacientes);
+                match = true;
               }
+            }
+            if (!match) {
+              pacientes.push(data[index]);
             }
           }
         });
       }
-      trava = false;
     }
   });
 } else {
