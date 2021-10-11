@@ -8,6 +8,8 @@ const order = require("../Functions/orderArray");
 const compare = require("../Functions/compare");
 const timsort = require("timsort");
 const mqtt = require("mqtt");
+const net = require("net");
+const selectedPatients = require("../Functions/selectPatients");
 
 //----------------------------------------------------------------------------------------------------------------
 let connectionLmt = 2;
@@ -15,10 +17,19 @@ let fogId = process.argv[2];
 let currentConnections = 0;
 let currentThreadId = 0;
 let brokerAdress = "mqtt://localhost:1883";
-let amount = 0;
+let amount = 10;
+const TCP_PORT = 8000;
+const TCP_IP = "127.0.0.1";
 //----------------------------------------------------------------------------------------------------------------
 
 if (isMainThread) {
+  const socket = new net.Socket();
+  socket.connect(TCP_PORT, TCP_IP, () => {
+    console.log("Conectado ao TCP: " + TCP_IP + ":" + TCP_PORT);
+  });
+  socket.on("data", (message) => {
+    amount = parseInt(message.toString());
+  });
   let pacientes = [];
   const client = mqtt.connect(brokerAdress); //Conexão com o Broker (Moquitto)
   if (currentThreadId == 0) {
@@ -41,6 +52,9 @@ if (isMainThread) {
           pacientes.push(data[index]);
         }
       }
+      timsort.sort(pacientes, compare);
+      //Criar um indentificador das fogs para mandar pro servidor/ para que o servidor substitua o array específico
+      socket.write(JSON.stringify(selectedPatients(pacientes, amount)));
       //Criar o servidor e a função de envio de informações, repassar os dados sempre que organizar e decidir o método de conexão.
     });
   }
@@ -78,6 +92,9 @@ if (isMainThread) {
               pacientes.push(data[index]);
             }
           }
+          timsort.sort(pacientes, compare);
+          const socket = new net.Socket();
+          socket.write(JSON.stringify(selectedPatients(pacientes, amount)));
         });
       }
     }
