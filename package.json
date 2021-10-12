@@ -4,9 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "Fog 1": "node Fog/fog.js 0",
+    "Fog 2": "node Fog/fog.js 1",
+    "Fog 3": "node Fog/fog.js 2",
+    "Fog 4": "node Fog/fog.js 3",
+    "Fog 5": "node Fog/fog.js 4",
     "Servidor": "node app.js",
-    "ClientePublisher": "node MQTT_client/clientePublisher.js",
-    "ClienteSubscriber": "node MQTT_client/clienteSubscriber.js",
     "Gerador": "node gerador_pacientes/gerador.js 10 0"
   },
   "author": "",

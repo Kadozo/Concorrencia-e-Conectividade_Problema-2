@@ -7,7 +7,7 @@ const timsort = require("timsort");
 const compare = require("./Functions/compare");
 //CONSTANTES DE ENDEREÇO
 const _PORT = 8080;
-const _IP = "26.91.70.227";
+const _IP = "127.0.0.1";
 
 const TCP_PORT = 8000;
 const TCP_IP = "127.0.0.1";
@@ -69,29 +69,33 @@ const serverTCP = net.createServer((socket) => {
   });
 
   socket.on("data", (message) => {
-    let fogPacientes = JSON.parse(message.toString());
-    let match = false;
-    let pos = 0;
-    let aux = [];
-    fogs.map((item, index) => {
-      if (item.id == fogPacientes.id) {
-        match = true;
-        pos = index;
-      }
-    });
-    if (!match) {
-      fogs.push(fogPacientes);
-    } else {
-      fogs.splice(pos, 1, fogPacientes);
-    }
-
-    fogs.map((item) => {
-      item.pacientes.map((item2) => {
-        aux.push(item2);
+    try {
+      let fogPacientes = JSON.parse(message.toString());
+      let match = false;
+      let pos = 0;
+      let aux = [];
+      fogs.map((item, index) => {
+        if (item.id == fogPacientes.id) {
+          match = true;
+          pos = index;
+        }
       });
-    });
-    timsort.sort(aux, compare);
-    pacientes = aux;
+      if (!match) {
+        fogs.push(fogPacientes);
+      } else {
+        fogs.splice(pos, 1, fogPacientes);
+      }
+
+      fogs.map((item) => {
+        item.pacientes.map((item2) => {
+          aux.push(item2);
+        });
+      });
+      timsort.sort(aux, compare);
+      pacientes = aux;
+    } catch (error) {
+      console.log(error.message);
+    }
   });
 });
 
