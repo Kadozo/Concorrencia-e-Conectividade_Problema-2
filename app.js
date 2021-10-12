@@ -17,6 +17,7 @@ const TCP_IP = "127.0.0.1";
 let pacientes = [];
 let amount = 10;
 let clients = [];
+let fogs = [];
 //-----------------------------------------------------------------------------------------------------------
 
 //Lógica para o mqtt
@@ -69,8 +70,28 @@ const serverTCP = net.createServer((socket) => {
 
   socket.on("data", (message) => {
     let fogPacientes = JSON.parse(message.toString());
-    //Lógica para a atualização do vetor de pacientes
-    pacientes.concat();
+    let match = false;
+    let pos = 0;
+    let aux = [];
+    fogs.map((item, index) => {
+      if (item.id == fogPacientes.id) {
+        match = true;
+        pos = index;
+      }
+    });
+    if (!match) {
+      fogs.push(fogPacientes);
+    } else {
+      fogs.splice(pos, 1, fogPacientes);
+    }
+
+    fogs.map((item) => {
+      item.pacientes.map((item2) => {
+        aux.push(item2);
+      });
+    });
+    timsort.sort(aux, compare);
+    pacientes = aux;
   });
 });
 

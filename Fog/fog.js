@@ -54,7 +54,12 @@ if (isMainThread) {
       }
       timsort.sort(pacientes, compare);
       //Criar um indentificador das fogs para mandar pro servidor/ para que o servidor substitua o array específico
-      socket.write(JSON.stringify(selectedPatients(pacientes, amount)));
+      socket.write(
+        JSON.stringify({
+          id: fogId,
+          pacientes: selectedPatients(pacientes, amount),
+        })
+      );
       //Criar o servidor e a função de envio de informações, repassar os dados sempre que organizar e decidir o método de conexão.
     });
   }
@@ -93,8 +98,12 @@ if (isMainThread) {
             }
           }
           timsort.sort(pacientes, compare);
-          const socket = new net.Socket();
-          socket.write(JSON.stringify(selectedPatients(pacientes, amount)));
+          socket.write(
+            JSON.stringify({
+              id: fogId,
+              pacientes: selectedPatients(pacientes, amount),
+            })
+          );
         });
       }
     }

@@ -48,7 +48,6 @@ if (isMainThread) {
       workerData.threadId = msg.toString();
       console.log(
         "Thread " +
-          workerData.threadId +
           " - Publicar em: " +
           "Fog/" +
           workerData.fogId +
@@ -61,7 +60,7 @@ if (isMainThread) {
           "Fog/" + workerData.fogId + "/" + workerData.threadId + "/send",
           valoresSensores(workerData.tendency, workerData.patientName)
         );
-      }, 5000);
+      }, 2000);
     });
   });
 }
