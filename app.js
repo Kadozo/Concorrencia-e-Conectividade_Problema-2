@@ -18,6 +18,7 @@ let pacientes = [];
 let amount = 10;
 let clients = [];
 let fogs = [];
+let fixado = {};
 //-----------------------------------------------------------------------------------------------------------
 
 //Lógica para o mqtt
@@ -36,14 +37,38 @@ app.post("/filter", (req, res) => {
   amount = req.body.amount;
 
   let i, socket;
+  let data = {
+    type: "amount",
+    amount: amount,
+  };
+
   for (i in clients) {
     socket = clients[i];
     if (socket.writable) {
-      socket.write(amount);
+      socket.write(JSON.stringify(data));
     }
   }
 
   return res.json({ message: "Quantidade alterada para " + amount });
+});
+
+app.post("/fixedPatient", (req, res) => {
+  let fogId = req.body.fogId;
+  let name = req.body.name;
+  let data = {
+    type: "info",
+    fogId: fogId,
+    name: name,
+  };
+
+  for (i in clients) {
+    socket = clients[i];
+    if (socket.writable) {
+      socket.write(JSON.stringify(data));
+    }
+  }
+
+  return res.json(fixado);
 });
 //-------------------------------------------------------------------------------------------------------------
 
@@ -70,30 +95,36 @@ const serverTCP = net.createServer((socket) => {
 
   socket.on("data", (message) => {
     try {
-      let fogPacientes = JSON.parse(message.toString());
-      let match = false;
-      let pos = 0;
-      let aux = [];
-      fogs.map((item, index) => {
-        if (item.id == fogPacientes.id) {
-          match = true;
-          pos = index;
-        }
-      });
-      if (!match) {
-        fogs.push(fogPacientes);
-      } else {
-        fogs.splice(pos, 1, fogPacientes);
-      }
-
-      fogs.map((item) => {
-        item.pacientes.map((item2) => {
-          aux.push(item2);
+      data = JSON.parse(message.toString());
+      if (data.type == "lista") {
+        let fogPacientes = data.content;
+        let match = false;
+        let pos = 0;
+        let aux = [];
+        fogs.map((item, index) => {
+          if (item.id == fogPacientes.id) {
+            match = true;
+            pos = index;
+          }
         });
-      });
-      timsort.sort(aux, compare);
-      pacientes = aux;
+        if (!match) {
+          fogs.push(fogPacientes);
+        } else {
+          fogs.splice(pos, 1, fogPacientes);
+        }
+
+        fogs.map((item) => {
+          item.pacientes.map((item2) => {
+            aux.push(item2);
+          });
+        });
+        timsort.sort(aux, compare);
+        pacientes = aux;
+      } else {
+        fixado = data.fixedPatient;
+      }
     } catch (error) {
+      console.log(message.toString());
       console.log(error.message);
     }
   });

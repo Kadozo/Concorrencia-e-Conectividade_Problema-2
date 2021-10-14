@@ -16,6 +16,7 @@ function valoresSensores(tendency, name) {
       oxigen: getRandomInt(91, 100),
       priority: 0,
       situation: "",
+      fogId: 0,
     };
   } else {
     paciente = {
@@ -27,6 +28,7 @@ function valoresSensores(tendency, name) {
       oxigen: getRandomInt(83, 92),
       priority: 0,
       situation: "",
+      fogId: 0,
     };
   }
 

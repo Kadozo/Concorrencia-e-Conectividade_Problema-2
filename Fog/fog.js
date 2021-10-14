@@ -3,6 +3,7 @@ const {
   isMainThread,
   workerData,
   parentPort,
+  threadId,
 } = require("worker_threads");
 const order = require("../Functions/orderArray");
 const compare = require("../Functions/compare");
@@ -10,6 +11,8 @@ const timsort = require("timsort");
 const mqtt = require("mqtt");
 const net = require("net");
 const selectedPatients = require("../Functions/selectPatients");
+const getPatient = require("../Functions/getPatient");
+const setPatientFogId = require("../Functions/setPatientFogId");
 
 //----------------------------------------------------------------------------------------------------------------
 let connectionLmt = 2;
@@ -20,6 +23,7 @@ let brokerAdress = "mqtt://localhost:1883";
 let amount = 10;
 const TCP_PORT = 8000;
 const TCP_IP = "127.0.0.1";
+let i = 0;
 //----------------------------------------------------------------------------------------------------------------
 
 if (isMainThread) {
@@ -27,8 +31,22 @@ if (isMainThread) {
   socket.connect(TCP_PORT, TCP_IP, () => {
     console.log("Conectado ao TCP: " + TCP_IP + ":" + TCP_PORT);
   });
+
   socket.on("data", (message) => {
-    amount = parseInt(message.toString());
+    let data = JSON.parse(message.toString());
+    if (data.type == "amount") {
+      amount = data.amount;
+    } else if (data.type == "info") {
+      if (data.fogId == fogId) {
+        fixedPatient = getPatient(pacientes, data.name);
+        socket.write(
+          JSON.stringify({
+            fixedPatient: fixedPatient,
+            type: "fixado",
+          })
+        );
+      }
+    }
   });
   let pacientes = [];
   const client = mqtt.connect(brokerAdress); //Conexão com o Broker (Moquitto)
@@ -56,8 +74,11 @@ if (isMainThread) {
       //Criar um indentificador das fogs para mandar pro servidor/ para que o servidor substitua o array específico
       socket.write(
         JSON.stringify({
-          id: fogId,
-          pacientes: selectedPatients(pacientes, amount),
+          content: {
+            id: fogId,
+            pacientes: selectedPatients(pacientes, amount),
+          },
+          type: "lista",
         })
       );
       //Criar o servidor e a função de envio de informações, repassar os dados sempre que organizar e decidir o método de conexão.
@@ -129,6 +150,7 @@ if (isMainThread) {
     let match = false;
     let pos = 0;
     let paciente = JSON.parse(msg.toString());
+    paciente = setPatientFogId(paciente, workerData.fogId);
     pacientes.map((item, index) => {
       if (item.name == paciente.name) {
         match = true;
