@@ -12,21 +12,18 @@ const _IP = "127.0.0.1";
 const TCP_PORT = 8000;
 const TCP_IP = "127.0.0.1";
 
-//ARRAY COM OS DADOS DOS SENSORES
+//DECLARAÇÃO DE VARIÁVEIS
 
 let pacientes = [];
 let amount = 10;
 let clients = [];
 let fogs = [];
-let fixado = {};
-//-----------------------------------------------------------------------------------------------------------
-
-//Lógica para o mqtt
-
-//-----------------------------------------------------------------------------------------------------------
+let fixado = null;
 const app = express();
 app.use(express.json());
 app.use(cors());
+//-----------------------------------------------------------------------------------------------------------
+
 //DECLARANDO AS ROTAS
 
 app.get("/patients", (req, res) => {
@@ -53,6 +50,7 @@ app.post("/filter", (req, res) => {
 });
 
 app.post("/fixedPatient", (req, res) => {
+  let flag = true;
   let fogId = req.body.fogId;
   let name = req.body.name;
   let data = {
@@ -65,11 +63,20 @@ app.post("/fixedPatient", (req, res) => {
     socket = clients[i];
     if (socket.writable) {
       socket.write(JSON.stringify(data));
+      socket.on("data", (message) => {
+        let data = JSON.parse(message.toString());
+        if (data.type == "fixado" && flag) {
+          flag = false;
+          fixado = data.fixedPatient;
+          return res.json(fixado);
+        }
+      });
     }
   }
 
-  return res.json(fixado);
+  //fazer a fog se conectar diretamente ou esperar o retorno do paciente fixado
 });
+
 //-------------------------------------------------------------------------------------------------------------
 
 //INICIANDO SERVIDOR HTTP
@@ -79,6 +86,8 @@ app.listen(_PORT, _IP, () => {
 });
 
 //---------------------------------------------------------------------------------------------------------------
+
+//SERVIDOR TCP
 
 const serverTCP = net.createServer((socket) => {
   console.log("Novo cliente conectado!");
@@ -120,8 +129,6 @@ const serverTCP = net.createServer((socket) => {
         });
         timsort.sort(aux, compare);
         pacientes = aux;
-      } else {
-        fixado = data.fixedPatient;
       }
     } catch (error) {
       console.log(message.toString());
