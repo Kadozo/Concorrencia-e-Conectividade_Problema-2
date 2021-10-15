@@ -64,11 +64,20 @@ app.post("/fixedPatient", (req, res) => {
     if (socket.writable) {
       socket.write(JSON.stringify(data));
       socket.on("data", (message) => {
-        let data = JSON.parse(message.toString());
-        if (data.type == "fixado" && flag) {
-          flag = false;
-          fixado = data.fixedPatient;
-          return res.json(fixado);
+        try {
+          let data = JSON.parse(message.toString());
+          if (data.type == "fixado" && flag) {
+            flag = false;
+            fixado = data.fixedPatient;
+            return res.json(fixado);
+          }
+        } catch (error) {
+          data = message.toString().split(message.toString().length / 2 - 1);
+          if (data.type == "fixado" && flag) {
+            flag = false;
+            fixado = data.fixedPatient;
+            return res.json(fixado);
+          }
         }
       });
     }
@@ -131,8 +140,32 @@ const serverTCP = net.createServer((socket) => {
         pacientes = aux;
       }
     } catch (error) {
-      console.log(message.toString());
-      console.log(error.message);
+      data = message.toString().split(message.toString().length / 2 - 1);
+      if (data.type == "lista") {
+        let fogPacientes = data.content;
+        let match = false;
+        let pos = 0;
+        let aux = [];
+        fogs.map((item, index) => {
+          if (item.id == fogPacientes.id) {
+            match = true;
+            pos = index;
+          }
+        });
+        if (!match) {
+          fogs.push(fogPacientes);
+        } else {
+          fogs.splice(pos, 1, fogPacientes);
+        }
+
+        fogs.map((item) => {
+          item.pacientes.map((item2) => {
+            aux.push(item2);
+          });
+        });
+        timsort.sort(aux, compare);
+        pacientes = aux;
+      }
     }
   });
 });

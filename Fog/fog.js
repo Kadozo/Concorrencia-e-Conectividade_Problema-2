@@ -33,18 +33,35 @@ if (isMainThread) {
   });
 
   socket.on("data", (message) => {
-    let data = JSON.parse(message.toString());
-    if (data.type == "amount") {
-      amount = data.amount;
-    } else if (data.type == "info") {
-      if (data.fogId == fogId) {
-        fixedPatient = getPatient(pacientes, data.name);
-        socket.write(
-          JSON.stringify({
-            fixedPatient: fixedPatient,
-            type: "fixado",
-          })
-        );
+    try {
+      let data = JSON.parse(message.toString());
+      if (data.type == "amount") {
+        amount = data.amount;
+      } else if (data.type == "info") {
+        if (data.fogId == fogId) {
+          fixedPatient = getPatient(pacientes, data.name);
+          socket.write(
+            JSON.stringify({
+              fixedPatient: fixedPatient,
+              type: "fixado",
+            })
+          );
+        }
+      }
+    } catch (error) {
+      let data = message.toString().split(message.toString().length / 2 - 1);
+      if (data.type == "amount") {
+        amount = data.amount;
+      } else if (data.type == "info") {
+        if (data.fogId == fogId) {
+          fixedPatient = getPatient(pacientes, data.name);
+          socket.write(
+            JSON.stringify({
+              fixedPatient: fixedPatient,
+              type: "fixado",
+            })
+          );
+        }
       }
     }
   });
@@ -71,6 +88,7 @@ if (isMainThread) {
         }
       }
       timsort.sort(pacientes, compare);
+      console.log(pacientes);
       //Criar um indentificador das fogs para mandar pro servidor/ para que o servidor substitua o array específico
       socket.write(
         JSON.stringify({
@@ -95,9 +113,8 @@ if (isMainThread) {
         currentConnections++;
         client.publish("Fog/" + fogId + "/connect", currentThreadId.toString());
       } else {
-        //O else ta resetando a contagem, mas ele ainda realiza uma conexão e n incrementa a variavel de conexões
         currentThreadId++;
-        currentConnections = 1; //Alterando para 1 resolve o problema e garante que n vai adicionar elementos a mais na thread
+        currentConnections = 1;
         const worker = new Worker(__filename, {
           workerData: {
             threadId: currentThreadId,
