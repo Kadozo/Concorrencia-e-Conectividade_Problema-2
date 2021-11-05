@@ -46,7 +46,3 @@ para iniciar a fog, o id_fog diz respeito a o valor do id que a fog que está se
 > node gerador.js [quantidade] [tendência]
 
 para iniciar o gerador de sensores, a quantidade diz respeito a quantas instâncias serão criadas, e , a tendência de respeito se os pacientes serão criados com a tendência **Estável** ou **Grave**, passando **1** ou **0** respectivamente.
-
-
-**OBS:** É necessário passar alterar no código, o campo **fogId** do gerador para que  os pacientes se conectem a aquela fog específica.
-
