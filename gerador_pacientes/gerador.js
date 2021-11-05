@@ -19,7 +19,7 @@ if (isMainThread) {
     const worker = new Worker(__filename, {
       workerData: {
         id: index + 1,
-        fogId: index % 5,
+        fogId: index % 2,
         threadId: "0",
         tendency: tendency,
         patientName: random_name(),
